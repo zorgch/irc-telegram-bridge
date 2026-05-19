@@ -1,6 +1,7 @@
 package irc
 
 import (
+	"fmt"
 	"net"
 	"time"
 
@@ -66,8 +67,8 @@ func (c Client) StartBot(errChan chan<- error, sendMessage func(string)) {
 	c.addHandlers()
 	// 10 second timeout for connection
 	if err := c.ConnectDialer(&net.Dialer{Timeout: 10 * time.Second}); err != nil {
+		c.logger.LogError(fmt.Sprintf("Failed to connect to IRC server %s:%d — %v", c.Settings.Server, c.Settings.Port, err))
 		errChan <- err
-		c.logger.LogError(err)
 	} else {
 		errChan <- nil
 	}

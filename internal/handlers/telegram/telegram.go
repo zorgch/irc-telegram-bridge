@@ -2,6 +2,8 @@
 package telegram
 
 import (
+	"fmt"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/ritlug/teleirc/internal"
 )
@@ -32,6 +34,10 @@ func NewClient(settings *internal.TelegramSettings, ircsettings *internal.IRCSet
 SendMessage sends a message to the Telegram channel specified in the settings
 */
 func (tg *Client) SendMessage(msg string) {
+	if tg.api == nil {
+		tg.logger.LogError("Cannot send Telegram message: bot API not initialized (check token and connectivity)")
+		return
+	}
 	newMsg := tgbotapi.NewMessage(tg.Settings.ChatID, "")
 	newMsg.Text = msg
 	if tg.Settings.QuoteNick {
@@ -55,16 +61,12 @@ returning any errors that occur
 */
 func (tg *Client) StartBot(errChan chan<- error, sendMessage func(string)) {
 	tg.logger.LogInfo("Starting up Telegram bot...")
-	var err error
-	tg.api, err = tgbotapi.NewBotAPI(tg.Settings.Token)
-	if err != nil {
-		tg.logger.LogError(err)
-		errChan <- err
-	}
 
 	if tg.api == nil {
-		tg.logger.LogError("Failed to authenticate to Telegram")
+		err := fmt.Errorf("Telegram bot API is not initialized")
+		tg.logger.LogError(err)
 		errChan <- err
+		return
 	}
 
 	tg.logger.LogInfo("Authorized on account", tg.api.Self.UserName)
