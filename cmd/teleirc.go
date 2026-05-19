@@ -52,7 +52,14 @@ func main() {
 	signalChannel := make(chan os.Signal, 1)
 	signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM)
 
-	var tgapi *tgbotapi.BotAPI
+	logger.LogInfo("Authenticating Telegram bot...")
+	tgapi, err := tgbotapi.NewBotAPI(settings.Telegram.Token)
+	if err != nil {
+		logger.LogError("Failed to authenticate Telegram bot (check your token and network connectivity):", err)
+		os.Exit(1)
+	}
+	logger.LogInfo("Telegram bot authorized on account @" + tgapi.Self.UserName)
+
 	tgClient := tg.NewClient(&settings.Telegram, &settings.IRC, &settings.Imgur, tgapi, logger, *flagMuteIrc)
 	tgChan := make(chan error)
 

@@ -331,3 +331,6 @@ tags
 
 # Local History for Visual Studio Code
 .history/
+
+# Snyk Security Extension - AI Rules (auto-generated)
+.github/instructions/snyk_rules.instructions.md
