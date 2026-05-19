@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"time"
+
 	"github.com/lrstanley/girc"
 	"github.com/ritlug/teleirc/internal"
 )
